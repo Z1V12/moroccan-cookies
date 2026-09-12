@@ -1,0 +1,336 @@
+/* ============================================================================
+   app.css — יועץ המגשים: מבנה בהשראת מסנג'ר.
+   בועות עגולות לגמרי (בלי "זנב" חד בפינה), פונט עגול ורך אחיד לכל הממשק,
+   משטחים שטוחים ונקיים, גרדיאנט חם ועדין. הכול נזיל, שום דבר חד.
+   ============================================================================ */
+
+:root{
+  --canvas:#FFFFFF;                    /* לבן — מקסימום ניגוד מול המסגרת הכהה */
+
+  --bg:#FFFFFF; --bg-2:#F5F6F7;
+  --ink:#050505; --muted:#65676B;
+  --sep:rgba(0,0,0,.08);
+  --header-bg:rgba(255,255,255,.92);
+  --input-bg:#F0F2F5; --input-fg:#050505;
+
+  --bubble-bot:#F0F0F0; --bubble-bot-fg:#050505;
+  --bubble-me-a:#4E9EFF; --bubble-me-b:#0064D6; --bubble-me-fg:#FFFFFF;
+
+  --accent:#0A7CFF; --accent-2:#4E9EFF; --accent-text:#0064D6; --accent-soft:#E7F2FF;
+  --card-bg:#FFFFFF; --card-line:rgba(0,0,0,.08);
+  --clay:#C0562F;  --clay-soft:#FBE7DC;
+  --olive:#5F7350; --olive-soft:#E9EFE2;
+  --honey:#9C6A0E; --honey-soft:#FBF0D8;
+
+  --shadow-soft:0 1px 2px rgba(0,0,0,.06), 0 8px 20px -12px rgba(0,0,0,.16);
+
+  --font:"Rubik","Segoe UI",-apple-system,sans-serif;
+}
+
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --canvas:#FFFFFF;                  /* לבן תמיד, גם במצב כהה — לפי בקשת הלקוח */
+    --bg:#0A0A0A; --bg-2:#18191A;
+    --ink:#E4E6EB; --muted:#B0B3B8;
+    --sep:rgba(255,255,255,.08);
+    --header-bg:rgba(10,10,10,.9);
+    --input-bg:#3A3B3C; --input-fg:#E4E6EB;
+
+    --bubble-bot:#3A3B3C; --bubble-bot-fg:#E4E6EB;
+    --bubble-me-a:#4E9EFF; --bubble-me-b:#0064D6; --bubble-me-fg:#FFFFFF;
+
+    --accent:#4E9EFF; --accent-2:#0A7CFF; --accent-text:#4E9EFF; --accent-soft:#1E2E44;
+    --card-bg:#242526; --card-line:rgba(255,255,255,.1);
+    --clay:#E8815B;  --clay-soft:#3A2417;
+    --olive:#93B07E; --olive-soft:#222C1B;
+    --honey:#E3A83F; --honey-soft:#33270F;
+
+    --shadow-soft:0 1px 2px rgba(0,0,0,.5), 0 8px 20px -12px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --canvas:#FFFFFF;
+  --bg:#0A0A0A; --bg-2:#18191A;
+  --ink:#E4E6EB; --muted:#B0B3B8;
+  --sep:rgba(255,255,255,.08);
+  --header-bg:rgba(10,10,10,.9);
+  --input-bg:#3A3B3C; --input-fg:#E4E6EB;
+
+  --bubble-bot:#3A3B3C; --bubble-bot-fg:#E4E6EB;
+  --bubble-me-a:#4E9EFF; --bubble-me-b:#0064D6; --bubble-me-fg:#FFFFFF;
+
+  --accent:#4E9EFF; --accent-2:#0A7CFF; --accent-text:#4E9EFF; --accent-soft:#1E2E44;
+  --card-bg:#242526; --card-line:rgba(255,255,255,.1);
+  --clay:#E8815B;  --clay-soft:#3A2417;
+  --olive:#93B07E; --olive-soft:#222C1B;
+  --honey:#E3A83F; --honey-soft:#33270F;
+
+  --shadow-soft:0 1px 2px rgba(0,0,0,.5), 0 8px 20px -12px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+/* בלי זה כרום מצייר את כל שטח הקנבס שאף אלמנט לא כיסה (כולל מחוץ לטלפון)
+   בשחור-ברירת-מחדל כשמערכת ההפעלה במצב כהה, גם אם body{background} לבן */
+html{color-scheme:light}
+html,body{height:100%}
+body{
+  background:var(--canvas);color:var(--bubble-bot-fg);font-family:var(--font);
+  font-size:16.5px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  overflow:hidden;
+}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+a{color:var(--accent-text);text-decoration:none}
+svg{display:block}
+::selection{background:var(--accent);color:#fff}
+:focus-visible{outline:2px solid var(--accent-text);outline-offset:2px;border-radius:6px}
+
+/* ---- קנבס נקי ושטוח ברחב — בלי דוגמאות, רק צבע רגוע שנותן לכרטיס לנשום ---- */
+@media(min-width:760px){
+  body{display:flex;align-items:center;justify-content:center;padding:28px}
+}
+
+/* ---- הכרטיס: מסך מלא בנייד, מסך-הטלפון בתוך המסגרת ברחב ---- */
+.chat-app{
+  position:fixed; inset:0;
+  display:flex; flex-direction:column;
+  background:var(--bg);
+  height:100dvh;
+}
+@media(min-width:760px){
+  .chat-app{
+    position:relative; inset:auto;
+    width:100%; height:100%;
+    border-radius:34px; overflow:hidden;
+    box-shadow:none;                    /* הצל עבר למסגרת החיצונית */
+  }
+}
+
+/* ---- מסגרת הטלפון: מוצגת רק ברחב. בנייד היא ריקה מסגנון —
+   position:fixed על chat-app מתעלם ממנה לגמרי, אז שום דבר לא זז ---- */
+.phone-frame{ display:contents }
+@media(min-width:760px){
+  .phone-frame{
+    display:block; position:relative;
+    width:min(400px, 92vw); height:min(860px, 92vh);
+    padding:18px 14px 30px;
+    background:linear-gradient(155deg, #3a3a3d, #101012);
+    border-radius:52px;
+    box-shadow:0 40px 70px -24px rgba(0,0,0,.55), inset 0 0 0 1.5px rgba(255,255,255,.07);
+  }
+  /* פינת הפעלה — "האי הדינמי" */
+  .phone-frame::before{
+    content:""; position:absolute; z-index:5;
+    top:18px; inset-inline-start:50%; transform:translateX(-50%);
+    width:92px; height:24px; background:#000; border-radius:14px;
+  }
+  /* פס הבית התחתון */
+  .phone-frame::after{
+    content:""; position:absolute; z-index:5;
+    bottom:10px; inset-inline-start:50%; transform:translateX(-50%);
+    width:112px; height:4px; border-radius:3px; background:rgba(255,255,255,.4);
+  }
+}
+
+.chat-head{
+  display:flex;align-items:center;gap:11px;
+  padding:calc(14px + env(safe-area-inset-top, 0px)) 18px 14px;
+  background:var(--header-bg);border-bottom:1px solid var(--sep);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);flex:none;
+}
+.chat-head .av{
+  width:38px;height:38px;border-radius:50%;flex:none;color:var(--accent);
+  display:grid;place-items:center;background:var(--accent-soft);
+}
+.chat-head .av svg{width:20px;height:20px}
+.chat-head b{display:block;font-size:16px;font-weight:700;line-height:1.25}
+.chat-head small{display:block;font-size:12.5px;color:var(--muted);margin-top:1px;font-weight:500}
+/* 44px הוא שטח המגע המומלץ למובייל — האייקון עצמו נשאר קטן, רק שטח הלחיצה גדל */
+.chat-head .restart{margin-inline-start:auto;width:44px;height:44px;border-radius:50%;
+  display:grid;place-items:center;color:var(--accent);transition:.15s}
+.chat-head .restart:hover{background:var(--input-bg)}
+.chat-head .restart svg{width:18px;height:18px}
+
+/* ---- פס התקדמות: קו רך ושטוח, בלי דרמה ---- */
+.chat-progress{height:3px;background:var(--sep);flex:none;overflow:hidden}
+.chat-progress .bar{height:100%;width:0%;background:var(--accent);
+  transition:width .35s ease, opacity .35s ease;border-radius:0 0 3px 3px}
+.chat-progress.done .bar{opacity:0}
+
+/* ---- רמז שימוש קטן ---- */
+.chat-hint{font-size:12px;color:var(--muted);text-align:center;font-weight:500;
+  padding:3px 16px 2px;max-height:22px;overflow:hidden;
+  transition:max-height .25s ease, opacity .25s ease, padding .25s ease}
+.chat-hint.hidden{max-height:0;opacity:0;padding:0}
+
+/* ============================================================================
+   מסך הבית — הדלת הראשית לפני שנכנסים לשיחה חיה.
+   בלי זה הביקור הראשון הוא בועת הקלדה ריקה שמרגישה כמו הדגמת AI גנרית;
+   עם זה יש זהות עסקית ברורה, שקיפות שזה עוזר אוטומטי, ונקודות כניסה מוכרות.
+   ============================================================================ */
+.chat-home[hidden]{display:none}
+.chat-home{
+  flex:1;overflow-y:auto;display:flex;flex-direction:column;align-items:center;
+  text-align:center;padding:32px 24px calc(24px + env(safe-area-inset-bottom, 0px));
+  background:var(--bg);
+  scrollbar-width:none;                 /* בלי זה רואים את פס הגלילה הרגיל של הדפדפן */
+}
+.chat-home::-webkit-scrollbar{display:none}
+.home-logo{
+  width:64px;height:64px;border-radius:50%;color:var(--accent);
+  background:var(--accent-soft);display:grid;place-items:center;margin-bottom:16px;flex:none;
+}
+.home-logo svg{width:32px;height:32px}
+.chat-home h1{font-size:21px;font-weight:800;margin-bottom:6px}
+.home-tag{font-size:13px;color:var(--muted);font-weight:600;margin-bottom:18px}
+.home-greet{font-size:15px;line-height:1.6;color:var(--ink);max-width:34ch;margin-bottom:24px}
+
+.home-starters{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:380px;margin-bottom:16px}
+.starter{
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  background:var(--bg-2);border-radius:16px;padding:16px 10px;
+  font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.35;transition:.15s;
+}
+.starter:hover{background:var(--accent-soft);transform:translateY(-1px)}
+.starter .ic{color:var(--accent)}
+.starter .ic svg{width:23px;height:23px}
+
+.home-cta{
+  width:100%;max-width:380px;padding:14px;border-radius:99px;font-size:15.5px;font-weight:700;
+  color:#fff;background:linear-gradient(135deg, var(--bubble-me-a), var(--bubble-me-b));
+  transition:.15s;
+}
+.home-cta:hover{filter:brightness(1.06)}
+.home-cta:active{transform:scale(.98)}
+
+/* [hidden] מפסיד לכללי display:flex/flex של הכרטיס הזה כי סגנון-מחבר
+   תמיד גובר על ברירת המחדל של הדפדפן — לכן צריך override מפורש */
+.chat-feed[hidden], .chat-form[hidden]{display:none}
+
+.chat-feed{
+  flex:1;overflow-y:auto;padding:16px 14px 8px;display:flex;flex-direction:column;gap:2px;
+  scrollbar-width:none;background:var(--bg);
+}
+.chat-feed::-webkit-scrollbar{display:none}
+
+/* ---- מפריד שעה: טקסט קטן וממורכז בלבד, בלי קווים מעטרים ---- */
+.time-div{display:flex;justify-content:center;margin:16px 0 10px;animation:msgIn .25s}
+.time-div span{font-size:11.5px;font-weight:600;color:var(--muted)}
+
+/* ---- הודעות: בועות עגולות לגמרי, קיבוץ צמוד, בלי זנב חד בפינה ---- */
+.msg{display:flex;max-width:100%;margin-top:10px;animation:msgIn .28s cubic-bezier(.2,.9,.3,1)}
+.msg.grouped{margin-top:3px}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px) scale(.98)}}
+
+.msg.bot{justify-content:flex-end}   /* בוט: מוצג בצד שמאל */
+.msg.me{justify-content:flex-start}  /* לקוח: מוצג בצד ימין */
+
+.msg .b{
+  padding:11px 16px;border-radius:20px;font-size:15.5px;line-height:1.45;max-width:78%;
+  overflow-wrap:anywhere;font-weight:400;
+}
+.msg.bot .b{background:var(--bubble-bot);color:var(--bubble-bot-fg)}
+.msg.me .b{
+  background:linear-gradient(135deg, var(--bubble-me-a), var(--bubble-me-b));
+  color:var(--bubble-me-fg);
+}
+
+.msg .b b{font-weight:700}
+.msg .b a{color:inherit;text-decoration:underline}
+.msg.me .b a{color:inherit}
+
+.msg.typing .b{display:flex;gap:5px;padding:14px 18px;align-items:center}
+.msg.typing i{width:7px;height:7px;border-radius:50%;background:var(--muted);opacity:.5;
+  animation:blink 1.3s infinite}
+.msg.typing i:nth-child(2){animation-delay:.18s}
+.msg.typing i:nth-child(3){animation-delay:.36s}
+@keyframes blink{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+
+/* ---- תוכן עשיר (כרטיס הצעה, חלופות, מגש ביטוח, כפתורים) ---- */
+.msg.rich{max-width:100%}
+.msg.rich .b{background:transparent;color:inherit;padding:0;max-width:min(94%,440px);border-radius:0}
+
+/* ---- הצעות מהירות (chips) — שורה שגוללים, רכה ומזמינה ---- */
+.chat-chips{display:flex;gap:8px;padding:2px 14px 0;max-height:0;overflow:hidden;
+  transition:max-height .25s,padding .25s}
+.chat-chips.on{
+  max-height:58px;padding:8px 14px 6px;overflow-x:auto;overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  mask-image:linear-gradient(to right, transparent, #000 22px, #000 calc(100% - 22px), transparent);
+  -webkit-mask-image:linear-gradient(to right, transparent, #000 22px, #000 calc(100% - 22px), transparent);
+}
+.chat-chips.on::-webkit-scrollbar{display:none}
+.qchip{flex:none;white-space:nowrap;border:none;background:var(--input-bg);color:var(--accent-text);
+  padding:9px 16px;border-radius:99px;font-size:14.5px;font-weight:600;transition:.15s}
+.qchip:hover{background:var(--accent-soft)}
+.qchip.on{background:var(--accent);color:#fff}
+.qchip.done{background:linear-gradient(135deg, var(--bubble-me-a), var(--bubble-me-b));color:#fff;font-weight:700}
+
+/* ---- שורת קלט ---- */
+.chat-form{display:flex;align-items:center;gap:9px;
+  padding:10px 12px calc(14px + env(safe-area-inset-bottom, 0px));
+  background:var(--bg);flex:none;border-top:1px solid var(--sep)}
+.chat-form input{flex:1;border:none;background:var(--input-bg);color:var(--input-fg);
+  border-radius:22px;padding:11px 17px;font:inherit;font-size:15.5px;outline:none;transition:.15s}
+.chat-form input:focus{box-shadow:inset 0 0 0 1.5px var(--accent)}
+.chat-form input::placeholder{color:var(--muted)}
+.chat-form button{width:36px;height:36px;border-radius:50%;color:#fff;
+  background:linear-gradient(135deg, var(--accent-2), var(--accent));
+  display:grid;place-items:center;flex:none;transition:.15s}
+.chat-form button:active{transform:scale(.92)}
+.chat-form button svg{width:17px;height:17px}
+
+@media (prefers-reduced-motion: reduce){
+  .msg, .time-div{animation:none !important}
+  .msg.typing i{animation:none !important;opacity:.6}
+  .chat-progress .bar, .chat-hint, .qchip, .btn, .chat-form input{transition:none !important}
+}
+
+/* ============================================================================
+   כרטיס ההצעה ותיבות התוכן — פינות רכות, שטוח ונקי, עקבי עם שאר הממשק
+   ============================================================================ */
+.buffer-note{background:var(--honey-soft);color:var(--bubble-bot-fg);
+  padding:12px 16px;border-radius:18px;font-size:14.5px;line-height:1.6}
+
+.prop{border-radius:20px;overflow:hidden;background:var(--card-bg);box-shadow:var(--shadow-soft)}
+.prop-top{display:grid;grid-template-columns:repeat(3,1fr)}
+.prop-top > div{padding:14px 6px;text-align:center}
+.prop-top small{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:500}
+.prop-top b{font-size:18px;line-height:1;font-weight:700}
+.prop-top > div:first-child b{font-size:23px;color:var(--accent-text)}
+.prop-mix{width:100%;border-collapse:collapse;font-size:14px}
+.prop-mix td{padding:8px 12px;border-top:1px solid var(--card-line)}
+.prop-mix .ic{width:32px;padding-inline-end:0}
+.prop-mix .ic svg{width:25px;height:25px;border-radius:50%}
+.prop-mix .nm{font-weight:600}
+.prop-mix .kg,.prop-mix .un{text-align:end;color:var(--muted);white-space:nowrap;font-size:13px}
+.prop-sum{display:flex;justify-content:space-between;align-items:baseline;
+  padding:13px 16px;background:var(--bg-2)}
+.prop-sum b.prop-sum-price{font-size:21px;font-weight:800;color:var(--accent-text)}
+.prop-fine{padding:8px 16px 12px;font-size:12px;color:var(--muted);line-height:1.5;background:var(--bg-2)}
+
+.ok-box{background:var(--olive-soft);color:var(--bubble-bot-fg);
+  padding:12px 16px;border-radius:18px;font-size:14.5px}
+.warn-box{background:var(--clay-soft);color:var(--bubble-bot-fg);
+  padding:12px 16px;border-radius:18px;font-size:14.3px;line-height:1.6}
+.alt-box{background:var(--card-bg);border-radius:20px;padding:15px 17px;box-shadow:var(--shadow-soft)}
+.alt-box > p{margin-bottom:10px;font-size:14.5px;line-height:1.6}
+.alt{padding:10px 0;border-top:1px solid var(--card-line)}
+.alt b{display:block;font-size:14.5px;margin-bottom:2px;font-weight:600}
+.alt span{font-size:13.4px;color:var(--muted);line-height:1.5}
+.backup-box{background:var(--honey-soft);color:var(--bubble-bot-fg);border-radius:20px;padding:14px 17px}
+.backup-box b{display:block;font-size:14.8px;margin-bottom:4px;font-weight:700}
+.backup-box b small{font-weight:500;color:var(--accent-text)}
+.backup-box span{font-size:13.6px;color:var(--muted);line-height:1.55}
+.warn-inline{color:var(--accent-text);font-size:13.4px}
+
+.cta-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:12px 22px;border-radius:99px;font-weight:700;font-size:15px;transition:.18s}
+.btn-p{background:linear-gradient(135deg, var(--bubble-me-a), var(--bubble-me-b));color:#fff}
+.btn-p:hover{filter:brightness(1.06)}
+.btn-s{background:var(--input-bg);color:inherit}
+.btn-s:hover{background:var(--accent-soft);color:var(--accent-text)}
+.btn-sm{padding:10px 18px;font-size:14px}
+
+.link-box{display:block;margin-top:6px;padding:10px 13px;background:var(--input-bg);
+  border-radius:14px;font-size:12.3px;overflow-wrap:anywhere;font-family:monospace}
