@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+
+Sitemap: https://z1v12.github.io/moroccan-cookies/sitemap.xml
