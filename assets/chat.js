@@ -584,10 +584,8 @@ const CHAT = (() => {
 
     await bot("רגע, מחשב לכם את זה…", 500);
 
-    // הבופר מוסבר בגלוי בתוך אותה תשובה — זה ההבדל בין הצעה שמחזיקה
-    // לבין הצעה שנגמרת, וזה חייב להיראות כמו תשובה אחת, לא כרטיס נפרד
     const gap = '<div style="height:8px"></div>';
-    await bot(`<div class="buffer-note">${r.bufferStory}</div>${gap}${card(r)}`, 750, true);
+    await bot(card(r), 750, true);
 
     // תקציב, אזהרות ומגש ביטוח — כולם הערות על אותה הצעה, מתקבצים לבלוק אחד
     const extras = [];
@@ -615,7 +613,6 @@ const CHAT = (() => {
     return `<div class="prop">
       <div class="prop-top">
         <div><small>כמות מומלצת</small><b>${r.kg} ק״ג</b></div>
-        <div><small>סה״כ יחידות</small><b>${r.units.toLocaleString("he-IL")}</b></div>
         <div><small>לכל אורח</small><b>${r.perGuest}</b></div>
       </div>
       <table class="prop-mix">${rows}</table>
@@ -647,7 +644,7 @@ const CHAT = (() => {
 
   function ctaBlock(r){
     return `<div class="cta-row">
-      <a class="btn btn-p btn-sm" target="_blank" rel="noopener" href="${wa(orderText(r))}">שליחת ההצעה בוואטסאפ</a>
+      <a class="btn btn-p btn-sm" target="_blank" rel="noopener" href="${wa(orderText(r))}">המשך סגירה עם נציג</a>
       <button class="btn btn-s btn-sm" onclick="CHAT.share()">שיתוף ההצעה</button>
     </div>`;
   }
