@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>פרטי העסק ותקנון | עוגיות מרוקאיות</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{color-scheme:light}
+  body{background:#FBF6EC;color:#2b2420;font-family:Rubik,system-ui,sans-serif;line-height:1.7;margin:0;padding:24px 16px 60px}
+  .wrap{max-width:720px;margin:0 auto}
+  h1{font-size:22px;margin-bottom:4px}
+  h2{font-size:17px;margin-top:32px;color:#8C4A2F}
+  p,li{font-size:15px;color:#3a332c}
+  .back{display:inline-block;margin-bottom:18px;color:#8C4A2F;text-decoration:none;font-weight:600}
+  .note{background:#F1E3D6;border-radius:14px;padding:14px 16px;font-size:13.5px;color:#5a4f45;margin-top:28px}
+  .missing{background:#f6d9d0;border-radius:14px;padding:14px 16px;font-size:13.5px;color:#7a2e1c;margin:12px 0}
+  small.upd{display:block;margin-top:6px;color:#8a8078}
+  table{width:100%;border-collapse:collapse;margin-top:8px}
+  td{padding:6px 4px;font-size:14.5px;border-top:1px solid #e8ddcd}
+  td:first-child{color:#8a8078;width:38%}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← חזרה לאתר</a>
+  <h1>פרטי העסק ותקנון</h1>
+  <small class="upd">עודכן לאחרונה: ספטמבר 2026</small>
+
+  <h2>פרטי מוכר (גילוי נאות לפי חוק הגנת הצרכן)</h2>
+  <table id="bizTable"></table>
+  <div id="bizMissing" class="missing" hidden>
+    ⚠ פרטי העסק (שם בעל/ת העסק, סוג העוסק ומספרו, ומען) עדיין לא הוזנו במערכת — הם חובה לפי חוק
+    הגנת הצרכן לפני שהאתר משמש למכירה בפועל ללקוחות. יש למלא אותם ב-<code>assets/data.js</code>
+    תחת <code>DATA.biz</code>.
+  </div>
+
+  <h2>אופי השירות</h2>
+  <p>
+    ה"עוזר האישי" באתר הוא כלי חישוב אוטומטי (ללא בינה מלאכותית חיצונית) שמציע כמות, תמהיל ומחיר
+    משוער על סמך הניסיון שלנו. ההצעה היא <b>הערכה בלבד</b> — המחיר וההזמנה הסופיים נסגרים ישירות
+    איתנו בוואטסאפ או בטלפון, ורק אז נחשבים סופיים ומחייבים.
+  </p>
+
+  <h2>תשלום</h2>
+  <p>מקדמה של <span id="depositPct"></span>% לתפיסת התאריך, והיתרה במסירה.</p>
+
+  <h2>ביטול / שינוי הזמנה</h2>
+  <p>
+    העוגיות מוכנות בעבודת יד לפי הזמנה אישית וכמות מדויקת לכל לקוח, ולעיתים גם מוצר מתכלה מטבעו.
+    בהתאם לתקנות הגנת הצרכן (ביטול עסקה), התשע״א-2010, זכות הביטול הרגילה עשויה שלא לחול או
+    להיות מוגבלת בזמן לגבי הזמנות כאלה. בפועל: נשתדל להיות גמישים ככל האפשר — פנו אלינו בהקדם
+    האפשרי אם יש צורך בשינוי או ביטול, ונמצא פתרון הוגן ביחד.
+  </p>
+
+  <h2>כשרות</h2>
+  <p>אופים במטבח בהשגחת <span id="kashrut"></span>. ניתן לבקש לראות את תעודת ההכשר בתוקף.</p>
+
+  <p style="margin-top:28px">
+    ראו גם: <a href="privacy.html">מדיניות פרטיות</a> · <a href="accessibility.html">הצהרת נגישות</a>
+  </p>
+
+  <div class="note">
+    מסמך זה הוכן ככלי עזר ואינו ייעוץ משפטי. מומלץ לבעל/ת העסק להעביר אותו לבדיקת עורך/ת דין
+    לפני הסתמכות עסקית מלאה עליו.
+  </div>
+</div>
+
+<script src="assets/data.js"></script>
+<script>
+  const b = DATA.biz;
+  document.getElementById("depositPct").textContent = b.depositPct;
+  document.getElementById("kashrut").textContent = b.kashrut || "בד״ץ (יש להשלים פרטים)";
+
+  const rows = [
+    ["שם העסק / בעל/ת העסק", b.legalName],
+    ["סוג העוסק", b.dealerType],
+    ["מספר עוסק / ח.פ", b.dealerNumber],
+    ["מען", b.address],
+    ["טלפון", b.phone],
+    ["וואטסאפ", "972" + b.waPhone.replace(/^972/, "")],
+    ["אזורי חלוקה", (b.areas || []).join(", ")]
+  ];
+  const tbl = document.getElementById("bizTable");
+  let missing = false;
+  rows.forEach(([label, val]) => {
+    const tr = document.createElement("tr");
+    if (!val) missing = true;
+    tr.innerHTML = `<td>${label}</td><td>${val || "— טרם הוזן —"}</td>`;
+    tbl.appendChild(tr);
+  });
+  if (missing) document.getElementById("bizMissing").hidden = false;
+</script>
+</body>
+</html>
