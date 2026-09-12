@@ -136,10 +136,14 @@ const ENGINE = (() => {
       totalKg += c.cartonKg || 1;
     });
 
+    // רצפת גיוון אמיתית: לא עוצרים לפני שהגענו למינימום הסוגים שהוגדר
+    // לאירוע הזה (ev.minT) — גם אם פריט חובה (למשל מרציפן) לבד כבר עבר
+    // את יעד המשקל. בלי זה, אירוע קטן מקבל "מגש" שהוא בעצם קרטון בודד.
+    const minTypes = Math.max(1, ev.minT || 1);
     for (const x of order) {
       if (chosen.some(ch => ch.c.id === x.c.id)) continue;   // כבר נכנס כ-alwaysInclude
       if (chosen.length >= nTypesTarget) break;
-      if (chosen.length > 0 && totalKg >= kg) break;   // כבר הגענו ליעד — לא מגוונים סתם
+      if (chosen.length >= minTypes && totalKg >= kg) break;   // הגענו גם ליעד וגם למינימום הגיוון
       const ck = x.c.cartonKg || 1;
       chosen.push({c:x.c, cartons:1});
       totalKg += ck;
