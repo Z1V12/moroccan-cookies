@@ -210,11 +210,40 @@ const ENGINE = (() => {
     return items;
   }
 
+  /* ---- עקביות מחיר בין רמות שולחן: "עשיר ומרשים" לא אמור לצאת זול יותר
+     מ"סטנדרטי" לאותם אירוע/אורחים — אחרת ההיגיון של השדרוג נשבר בעיני
+     הלקוח. מוסיפים קרטונים לפריטים היוקרתיים ביותר שכבר בתמהיל (ואם
+     צריך, גם פריט יוקרתי נוסף מהקטלוג) עד שהמחיר עובר את הרף. ---- */
+  function topUpCost(items, catalog, targetCost){
+    let cost = items.reduce((s,i) => s + i.price, 0);
+    if (cost >= targetCost) return items;
+
+    const byPremium = items.slice().sort((a,b) => (b.pk||0) - (a.pk||0));
+    let guard = 0;
+    while (cost < targetCost && guard < 100){
+      let added = false;
+      for (const it of byPremium){
+        if (cost >= targetCost) break;
+        const c = catalog.find(x => x.id === it.id);
+        if (!c) continue;
+        it.cartons += 1;
+        it.kg    = round(it.cartons * (c.cartonKg || 1), 1e-6);
+        it.units = Math.round(it.kg * (c.upk || 45));
+        it.price = it.cartons * (c.cartonPrice != null ? c.cartonPrice : it.kg * (c.pk || 0));
+        cost = items.reduce((s,i) => s + i.price, 0);
+        added = true; guard++;
+        if (cost >= targetCost) break;
+      }
+      if (!added) break;
+    }
+    return items;
+  }
+
   /* ---- שלב ה׳: התאמת תקציב ---- */
   // תמהיל מצומצם אמיתי: פחות סוגים, אותו משקל — כדי שהחלופה תהיה מספר ולא סיסמה
   function leanMix(q, guests, catalog, nTypes){
     const lean = Object.assign({}, q.ev, {minT:nTypes, maxT:nTypes});
-    const items = buildMix(q.kg, guests, catalog, {ev:lean, cheap:true});
+    const items = enforceMinOrder(buildMix(q.kg, guests, catalog, {ev:lean, cheap:true}), catalog, E().minOrderValue);
     return {items, cost: items.reduce((s,i) => s + i.price, 0), n: items.length};
   }
 
@@ -257,7 +286,9 @@ const ENGINE = (() => {
     }
 
     if (gap <= E().budgetSoftGap) {
-      const cheap     = buildMix(q.kg, guests, catalog, {ev:q.ev, cheap:true});
+      // גם התמהיל המוזל חייב לעמוד ברצפת המחיר המינימלית — אחרת "לחסוך
+      // בתקציב" יכול להחזיר הצעה שמפרה בשקט את הכלל העסקי (ראה enforceMinOrder)
+      const cheap     = enforceMinOrder(buildMix(q.kg, guests, catalog, {ev:q.ev, cheap:true}), catalog, E().minOrderValue);
       const cheapCost = cheap.reduce((s,i) => s + i.price, 0);
       if (cheapCost <= budget * 1.02) {
         return {mode:"remixed", items:cheap, cost:cheapCost, saved:cost-cheapCost,
@@ -323,6 +354,27 @@ const ENGINE = (() => {
 
     let items    = buildMix(q.kg, q.guests, f.list, {ev:q.ev, likes:inp.likes, level:inp.level});
     items        = enforceMinOrder(items, f.list, E().minOrderValue);
+
+    // עקביות מחיר בין רמות: "עשיר ומרשים" לא יוצא זול יותר מ"סטנדרטי", ו"קליל
+    // וחסכוני" לא יוצא יקר יותר ממנו. בגלל גרנולריות הקרטונים (בעיקר כשרצפת
+    // המחיר המינימלית שולטת), זה יכול לקרות בטעות בלי הבדיקה הזו — וזה שובר
+    // את ההיגיון של הבחירה בעיני הלקוח.
+    if (inp.level === "generous" || inp.level === "light") {
+      const stdQ = quantity(Object.assign({}, inp, {level:"standard"}));
+      const stdItems = enforceMinOrder(
+        buildMix(stdQ.kg, q.guests, f.list, {ev:q.ev, likes:inp.likes, level:"standard"}),
+        f.list, E().minOrderValue);
+      const stdCost = stdItems.reduce((s,i) => s + i.price, 0);
+      const curCost = items.reduce((s,i) => s + i.price, 0);
+      if (inp.level === "generous" && curCost < stdCost) {
+        items = topUpCost(items, f.list, stdCost);
+      } else if (inp.level === "light" && curCost > stdCost) {
+        // "קליל" לא אמור לצאת יקר מ"סטנדרטי" — התמהיל הסטנדרטי כאן זול
+        // יותר וגם מכיל כמות זהה או גדולה יותר, אז הוא חלופה בטוחה
+        items = stdItems;
+      }
+    }
+
     const budget = reconcileBudget(q, items, f.list, +inp.budget || 0, q.guests);
     items = budget.items;
 
