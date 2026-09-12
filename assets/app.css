@@ -212,6 +212,14 @@ svg{display:block}
 }
 .chat-feed::-webkit-scrollbar{display:none}
 
+/* ---- שורת קישורים משפטיים: תמיד בתחתית הכרטיס, גם במסך הבית וגם בשיחה,
+   כי הצ'אט הוא כל האתר ואין footer נפרד לעמוד ---- */
+.chat-legal{
+  flex:none;text-align:center;padding:6px 14px calc(8px + env(safe-area-inset-bottom, 0px));
+  font-size:11px;color:var(--muted);background:var(--bg);
+}
+.chat-legal a{color:var(--muted);text-decoration:underline}
+
 /* ---- מפריד שעה: טקסט קטן וממורכז בלבד, בלי קווים מעטרים ---- */
 .time-div{display:flex;justify-content:center;margin:16px 0 10px;animation:msgIn .25s}
 .time-div span{font-size:11.5px;font-weight:600;color:var(--muted)}
