@@ -517,8 +517,30 @@ const CHAT = (() => {
               "אלרגיות, משלוח, זמני הכנה או על עוגייה מסוימת.");
   }
 
+  /* ==========================================================================
+     דיווח לידים לגיליון (Google Sheets דרך Apps Script) — אופציונלי לגמרי.
+     כל עוד DATA.biz.leadsEndpoint ריק, שום דבר לא נשלח לשום מקום — האתר
+     ממשיך לעבוד בדיוק כמו קודם, אפס שינוי בהתנהגות. text/plain בכוונה:
+     Apps Script קורא את הגוף הגולמי בכל מקרה, וזה חוסך CORS preflight
+     שנכשל מול כתובות exec של Apps Script.
+     ========================================================================== */
+  function logLead(payload){
+    const url = DATA.biz && DATA.biz.leadsEndpoint;
+    if (!url) return;
+    try {
+      fetch(url, {
+        method: "POST", mode: "no-cors",
+        headers: {"Content-Type": "text/plain;charset=utf-8"},
+        body: JSON.stringify(Object.assign({src:S.src}, payload))
+      }).catch(() => {});
+    } catch(e){}
+  }
+
   async function handoff(){
     const t = transcript();
+    const s = S.slots;
+    logLead({eventType:s.eventType, guests:s.guests, level:s.level,
+              diet:(s.diet||[]).join(","), done:false, clickedWhatsApp:true});
     await bot(`בטח. הנה קיצור דרך — הלחיצה פותחת וואטסאפ עם כל מה שדיברנו עד עכשיו, ` +
               `כדי שלא תצטרכו לכתוב הכול מחדש.` +
               `<div class="cta-row"><a class="btn btn-p btn-sm" target="_blank" rel="noopener" href="${wa(t)}">פתיחת וואטסאפ</a></div>`);
@@ -578,9 +600,15 @@ const CHAT = (() => {
     updateProgress();
 
     if (!r.ok){
+      logLead({eventType:s.eventType, guests:s.guests, level:s.level,
+                diet:(s.diet||[]).join(","), done:false, clickedWhatsApp:false});
       await bot(r.msg + `<div class="cta-row"><a class="btn btn-p btn-sm" target="_blank" rel="noopener" href="${wa(transcript())}">לדבר איתנו בוואטסאפ</a></div>`);
       return;
     }
+
+    logLead({eventType:s.eventType, guests:s.guests, level:s.level,
+              diet:(s.diet||[]).join(","), kg:r.kg, cost:r.cost,
+              done:true, clickedWhatsApp:false});
 
     await bot("רגע, מחשב לכם את זה…", 500);
 
@@ -644,9 +672,20 @@ const CHAT = (() => {
 
   function ctaBlock(r){
     return `<div class="cta-row">
-      <a class="btn btn-p btn-sm" target="_blank" rel="noopener" href="${wa(orderText(r))}">המשך סגירה עם נציג</a>
+      <a class="btn btn-p btn-sm" target="_blank" rel="noopener" href="${wa(orderText(r))}" onclick="CHAT.logWhatsAppClick()">המשך סגירה עם נציג</a>
       <button class="btn btn-s btn-sm" onclick="CHAT.share()">שיתוף ההצעה</button>
     </div>`;
+  }
+
+  // נקרא מה-onclick של כפתור הוואטסאפ בכרטיס ההצעה — לא חוסם את הפתיחה
+  // (הקישור עצמו ממשיך כרגיל), רק שולח עדכון שהליד "חם": הגיע להצעה וגם לחץ
+  function logWhatsAppClick(){
+    const s = S.slots;
+    logLead({eventType:s.eventType, guests:s.guests, level:s.level,
+              diet:(s.diet||[]).join(","),
+              kg: lastResult && lastResult.ok ? lastResult.kg : "",
+              cost: lastResult && lastResult.ok ? lastResult.cost : "",
+              done: !!(lastResult && lastResult.ok), clickedWhatsApp:true});
   }
 
   /* ---- הסיכום שנשלח אליך בוואטסאפ ---- */
@@ -848,7 +887,7 @@ const CHAT = (() => {
     }
   }
 
-  return {init, open, close, say, share, reset, confirmRestart, get state(){ return S; }};
+  return {init, open, close, say, share, reset, confirmRestart, logWhatsAppClick, get state(){ return S; }};
 })();
 
 document.addEventListener("DOMContentLoaded", CHAT.init);
