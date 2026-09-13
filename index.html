@@ -6,6 +6,7 @@
 <title>יועץ המגשים | עוגיות מרוקאיות</title>
 <meta name="description" content="יועץ חכם שמחשב לכם כמה עוגיות מרוקאיות צריך לאירוע — כמות, תמהיל ומחיר לפי מספר האורחים, סוג האירוע והתקציב.">
 <meta name="theme-color" content="#FBF6EC">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://script.google.com; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="עוגיות מרוקאיות">
@@ -115,7 +116,7 @@
   <div class="chat-hint" id="chatHint">אפשר גם ללחוץ על אחת האפשרויות, וגם לכתוב בחופשיות</div>
 
   <form class="chat-form" id="chatForm" autocomplete="off" hidden>
-    <input id="chatInput" type="text" placeholder="כתבו לי מה שבא לכם…" aria-label="הודעה">
+    <input id="chatInput" type="text" maxlength="300" placeholder="כתבו לי מה שבא לכם…" aria-label="הודעה">
     <button type="submit" aria-label="שליחה">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H5M11 6l-6 6 6 6"/></svg>
     </button>
@@ -127,13 +128,10 @@
 </div>
 </div>
 
-<script src="assets/data.js?v=1789291766320"></script>
-<script src="assets/art.js?v=1789291766320"></script>
-<script src="assets/engine.js?v=1789291766320"></script>
-<script src="assets/nlu.js?v=1789291766320"></script>
-<script src="assets/chat.js?v=1789291766320"></script>
-<script>
-  document.getElementById("chatRestart").addEventListener("click", () => CHAT.confirmRestart());
-</script>
+<script src="assets/data.js?v=1789334199188"></script>
+<script src="assets/art.js?v=1789334199188"></script>
+<script src="assets/engine.js?v=1789334199188"></script>
+<script src="assets/nlu.js?v=1789334199188"></script>
+<script src="assets/chat.js?v=1789334199188"></script>
 </body>
 </html>
